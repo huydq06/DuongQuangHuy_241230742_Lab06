@@ -21,5 +21,8 @@ namespace Tuan6.Models.DataModels
         [DisplayName("Email")]
         [DataType(DataType.EmailAddress)]
         public string Email { get; set; } = string.Empty;
+        public DateTime Birthday { get; set; }
+        public string Phone {  get; set; }
+
     }
 }

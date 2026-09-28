@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Text.RegularExpressions;
 using Tuan6.Models.DataModels;
 
 namespace Tuan6.Controllers
@@ -40,9 +41,44 @@ namespace Tuan6.Controllers
         [HttpPost]//hành động gọi ứng với method là post
         public IActionResult Create(Member member)
         {
-            member.MemberId = Guid.NewGuid().ToString();
-            members.Add(member);
-            return RedirectToAction("GetMembers");
+            string msg = null;
+            bool validate = true;
+            if (string.IsNullOrEmpty(member.Username) || member.Username.Length < 3 || member.Username.Length > 20)
+            {
+                msg = "<li> Tên đăng nhập phải có độ dài tư 3 đến 20 ký tự </li>";
+                validate = false;
+            }
+            string patteremail = @"[a-z0-9,_%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$";
+            if (string.IsNullOrEmpty(member.Email) || !Regex.IsMatch(member.Email, patteremail))
+            {
+                msg += "<li>Email không đúng định dạng</li>";
+                validate = false;
+            }
+            if (member.Birthday.AddYears(18) > DateTime.Now)
+            {
+                msg += "<li>Bạn chưa đủ 18 tuổi</li>";
+                validate = false;
+            }
+            string patterphone = @"^0\d{9,12}$";
+            if (string.IsNullOrEmpty(member.Phone) || !Regex.IsMatch(member.Phone, patterphone))
+            {
+                msg += "<li>Số điện thoại không hợp lệ</li>";
+                validate = false;   
+            }
+            if (validate)
+            {
+                member.MemberId = Guid.NewGuid().ToString();
+                members.Add(member);
+                return RedirectToAction("GetMembers");
+            }
+            else
+            {
+                ViewBag.msg = "<div class='alert alert-danger'>" + msg + "</div>";
+                return View(member);
+            }
+            //member.MemberId = Guid.NewGuid().ToString();
+            //members.Add(member);
+            //return RedirectToAction("GetMembers");
         }
     }
 }

@@ -1,0 +1,45 @@
+﻿using Lab06.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Tuan6.Models.DataModels;
+
+namespace Lab06.Controllers
+{
+    public class MembersController : Controller
+    {
+        public static readonly List<Member> members = new List<Member>();
+
+        public IActionResult Index()
+        {
+            return View(members);
+        }
+
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Create(RegisterViewModel register)
+        {
+            if (ModelState.IsValid)
+            {
+                Member m = new Member
+                {
+                    MemberId = Guid.NewGuid().ToString(),
+                    Username = register.UserName,
+                    Fullname = register.FullName,
+                    Email = register.Email,
+                    Password = register.Password,
+                    Phone = register.Phone,
+                    Birthday = register.Birthday,
+                };
+                members.Add(m);
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return View(register);
+            }
+        }
+    }
+}
